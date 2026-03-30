@@ -4,11 +4,11 @@ import { getBlogBySlug, getRelatedArticles, getRecentStories } from '@/lib/queri
 import HeroSection from './_components/HeroSection';
 import ArticleContent from './_components/ArticleContent';
 import AuthorBio from './_components/AuthorBio';
+import ArticleSidebar from './_components/ArticleSidebar';
 import RelatedArticles from './_components/RelatedArticles';
 import CommentsSection from './_components/CommentsSection';
 import TableOfContents from './_components/TableOfContents';
 import EngagementBar from './_components/EngagementBar';
-import ArticleBottomWidgets from './_components/ArticleBottomWidgets';
 
 // Generate SEO metadata dynamically
 export async function generateMetadata({ params }) {
@@ -127,36 +127,47 @@ export default async function BlogDetailPage({ params }) {
         {/* Full-width cinematic hero */}
         <HeroSection blog={blog} />
 
-        {/* Main content area — narrow column for readability */}
-        <main className="max-w-3xl mx-auto px-5 sm:px-6 py-10 md:py-14">
-          <article>
-            {/* Table of Contents (if article is long) */}
-            {blog.content && blog.content.length > 3000 && (
-              <TableOfContents content={blog.content} />
-            )}
+        {/* Main content area with sidebar */}
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 md:py-14">
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-12">
 
-            {/* Article Content */}
-            <ArticleContent blog={blog} />
+            {/* Left column — Article content */}
+            <main className="flex-1 min-w-0">
+              <article>
+                {/* Table of Contents (if article is long) */}
+                {blog.content && blog.content.length > 3000 && (
+                  <TableOfContents content={blog.content} />
+                )}
 
-            {/* Author Bio */}
-            <AuthorBio author={blog} />
+                {/* Article Content */}
+                <ArticleContent blog={blog} />
 
-            {/* Comments Section */}
-            <CommentsSection blogId={blog.id} />
-          </article>
+                {/* Author Bio */}
+                <AuthorBio author={blog} />
 
-          {/* Sidebar widgets moved below article */}
-          <ArticleBottomWidgets
-            recentStories={recentStories}
-            tags={blog.tags || []}
-            categories={blog.categories || []}
-          />
+                {/* Comments Section */}
+                <CommentsSection blogId={blog.id} />
+              </article>
 
-          {/* Related Articles */}
-          {relatedArticles && relatedArticles.length > 0 && (
-            <RelatedArticles articles={relatedArticles} />
-          )}
-        </main>
+              {/* Related Articles — full width below article */}
+              {relatedArticles && relatedArticles.length > 0 && (
+                <RelatedArticles articles={relatedArticles} />
+              )}
+            </main>
+
+            {/* Right column — Sidebar (desktop only) */}
+            <aside className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
+              <div className="sticky top-24 space-y-6">
+                <ArticleSidebar
+                  recentStories={recentStories}
+                  tags={blog.tags || []}
+                  categories={blog.categories || []}
+                />
+              </div>
+            </aside>
+
+          </div>
+        </div>
 
         {/* Sticky engagement bar */}
         <EngagementBar

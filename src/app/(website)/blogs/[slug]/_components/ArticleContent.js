@@ -53,16 +53,16 @@ export default function ArticleContent({ blog }) {
             {/* Inline article typography styles */}
             <style jsx>{`
                 .article-prose {
-                    font-size: 1.125rem;
-                    line-height: 1.85;
+                    font-size: 1.0625rem;
+                    line-height: 1.8;
                     color: #374151;
-                    letter-spacing: 0.01em;
+                    letter-spacing: 0.005em;
                 }
                 .article-prose p {
                     margin-bottom: 1.5em;
                 }
                 .article-prose h2 {
-                    font-size: 1.625rem;
+                    font-size: 1.5rem;
                     font-weight: 700;
                     color: #111827;
                     margin-top: 2.5em;
@@ -71,7 +71,7 @@ export default function ArticleContent({ blog }) {
                     letter-spacing: -0.01em;
                 }
                 .article-prose h3 {
-                    font-size: 1.3rem;
+                    font-size: 1.25rem;
                     font-weight: 600;
                     color: #1f2937;
                     margin-top: 2em;
@@ -79,7 +79,7 @@ export default function ArticleContent({ blog }) {
                     line-height: 1.35;
                 }
                 .article-prose h4 {
-                    font-size: 1.1rem;
+                    font-size: 1.0625rem;
                     font-weight: 600;
                     color: #1f2937;
                     margin-top: 1.75em;

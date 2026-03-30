@@ -6,7 +6,7 @@ export default function RelatedArticles({ articles }) {
                 <div className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
                 <h2 className="text-2xl font-bold text-gray-900">Continue Reading</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {articles.map((article) => (
                     <a
                         key={article.id}
