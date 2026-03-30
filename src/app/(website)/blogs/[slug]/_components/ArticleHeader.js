@@ -1,4 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
+'use client';
+
+import ReportButton from '@/components/interactive/ReportButton';
+
 export default function ArticleHeader({ blog }) {
     return (
         <header className="mb-8">
@@ -17,10 +21,17 @@ export default function ArticleHeader({ blog }) {
                 </div>
             )}
 
-            {/* Title */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                {blog.title}
-            </h1>
+            {/* Title + Report */}
+            <div className="flex items-start justify-between gap-4 mb-4">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 flex-1">
+                    {blog.title}
+                </h1>
+                <ReportButton
+                    contentType="BLOG"
+                    contentId={blog.id}
+                    contentTitle={blog.title}
+                />
+            </div>
 
             {/* Author & Meta */}
             <div className="flex flex-wrap items-center gap-4 mb-6 pb-6 border-b border-gray-200">

@@ -34,11 +34,22 @@ export async function middleware(request) {
         '/api/comments',
         '/api/cookie-consent',
         '/api/contact',
+        '/api/newsletter',
+        '/api/likes',
+        '/api/bookmarks',
+        '/api/follow',
+        '/api/reports',
+        '/api/events/rsvp',
     ];
 
     const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
 
     if (isPublicPath) {
+        return NextResponse.next();
+    }
+
+    // All /api/* routes should be public (they handle auth internally)
+    if (pathname.startsWith('/api/')) {
         return NextResponse.next();
     }
 

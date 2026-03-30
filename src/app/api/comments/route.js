@@ -1,5 +1,4 @@
 import { query } from '@/lib/db';
-import { getUserFromToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 // GET comments for a blog
@@ -15,12 +14,12 @@ export async function GET(req) {
         const comments = await query(`
         SELECT
           c.id, c.content, c.created_at, c.like_count,
-          c.author_name, c.author_email,
+          c.author_name, c.author_email, c.parent_id,
           u.id as user_id, u.avatar_url
         FROM comments c
         LEFT JOIN public_users u ON c.user_id = u.id
         WHERE c.blog_id = ? AND c.status = 'APPROVED'
-        ORDER BY c.created_at DESC
+        ORDER BY c.created_at ASC
       `, [blogId]);
 
         return NextResponse.json(comments);
@@ -33,7 +32,7 @@ export async function GET(req) {
 // POST a new comment
 export async function POST(req) {
     try {
-        const { blogId, content, authorName, authorEmail, userId } = await req.json();
+        const { blogId, content, authorName, authorEmail, userId, parentId } = await req.json();
 
         if (!blogId || !content) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -56,10 +55,25 @@ export async function POST(req) {
             return NextResponse.json({ error: 'User not found' }, { status: 401 });
         }
 
+        // If parentId is provided, validate it exists and belongs to the same blog
+        let depth = 0;
+        let threadPath = null;
+        if (parentId) {
+            const parentComment = await query(
+                'SELECT id, depth, thread_path FROM comments WHERE id = ? AND blog_id = ?',
+                [parentId, blogId]
+            );
+            if (!parentComment || parentComment.length === 0) {
+                return NextResponse.json({ error: 'Parent comment not found' }, { status: 404 });
+            }
+            depth = parentComment[0].depth + 1;
+            threadPath = parentComment[0].thread_path || parentId;
+        }
+
         const result = await query(`
-      INSERT INTO comments (blog_id, user_id, author_name, author_email, content, status)
-      VALUES (?, ?, ?, ?, ?, 'PENDING')
-    `, [blogId, userId, authorName || 'Anonymous', authorEmail || null, content]);
+      INSERT INTO comments (blog_id, user_id, author_name, author_email, content, status, parent_id, depth, thread_path)
+      VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?)
+    `, [blogId, userId, authorName || 'Anonymous', authorEmail || null, content, parentId || null, depth, threadPath]);
 
         // Update comment count
         await query(`
@@ -68,7 +82,7 @@ export async function POST(req) {
 
         return NextResponse.json({
             success: true,
-
+            commentId: result.insertId || null,
             message: 'Comment submitted for moderation'
         });
     } catch (error) {

@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import CommentForm from '@/components/interactive/CommentForm';
+import ReportButton from '@/components/interactive/ReportButton';
 import GoogleAd from '@/components/ui/GoogleAd';
 
 export default function CommentsSection({ blogId }) {
@@ -49,6 +50,90 @@ export default function CommentsSection({ blogId }) {
         return date.toLocaleDateString();
     };
 
+    // Build a nested comment tree from flat list
+    const buildTree = (flatComments) => {
+        const map = {};
+        const tree = [];
+
+        flatComments.forEach(comment => {
+            map[comment.id] = { ...comment, replies: [] };
+        });
+
+        flatComments.forEach(comment => {
+            if (comment.parent_id && map[comment.parent_id]) {
+                map[comment.parent_id].replies.push(map[comment.id]);
+            } else {
+                tree.push(map[comment.id]);
+            }
+        });
+
+        return tree;
+    };
+
+    const renderComment = (comment, isReply = false) => (
+        <div key={comment.id} className={`${isReply ? 'ml-12 mt-4' : ''}`}>
+            <div className="flex gap-3">
+                <img
+                    src={comment.avatar_url || '/default-avatar.png'}
+                    alt={comment.author_name}
+                    className="w-10 h-10 rounded-full object-cover"
+                />
+
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-gray-900">
+                            {comment.author_name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                            {formatDate(comment.created_at)}
+                        </span>
+                    </div>
+
+                    <p className="text-gray-700">{comment.content}</p>
+
+                    <div className="flex items-center gap-3 mt-2">
+                        <button
+                            onClick={() => setReplyTo(comment.id)}
+                            className="text-xs text-blue-600 hover:text-blue-800"
+                        >
+                            Reply
+                        </button>
+
+                        {/* Report comment button */}
+                        <ReportButton
+                            contentType="COMMENT"
+                            contentId={comment.id}
+                            contentTitle={`Comment by ${comment.author_name}`}
+                        />
+                    </div>
+
+                    {/* Reply Form */}
+                    {replyTo === comment.id && (
+                        <div className="mt-3 pl-6">
+                            <CommentForm
+                                blogId={blogId}
+                                parentId={comment.id}
+                                onCommentAdded={() => {
+                                    setReplyTo(null);
+                                    fetchComments();
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Nested replies */}
+                    {comment.replies && comment.replies.length > 0 && (
+                        <div className="mt-3">
+                            {comment.replies.map(reply => renderComment(reply, true))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+
+    const commentTree = buildTree(comments);
+
     return (
         <div className="mt-8 pt-6 border-t border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -83,51 +168,9 @@ export default function CommentsSection({ blogId }) {
                         </div>
                     ))}
                 </div>
-            ) : comments.length > 0 ? (
+            ) : commentTree.length > 0 ? (
                 <div className="space-y-6">
-                    {comments.map((comment) => (
-                        <div key={comment.id} className="flex gap-3">
-                            <img
-                                src={comment.avatar_url || '/default-avatar.png'}
-                                alt={comment.author_name}
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
-
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-gray-900">
-                                        {comment.author_name}
-                                    </span>
-                                    <span className="text-xs text-gray-500">
-                                        {formatDate(comment.created_at)}
-                                    </span>
-                                </div>
-
-                                <p className="text-gray-700">{comment.content}</p>
-
-                                <button
-                                    onClick={() => setReplyTo(comment.id)}
-                                    className="text-xs text-blue-600 hover:text-blue-800 mt-2"
-                                >
-                                    Reply
-                                </button>
-
-                                {/* Reply Form */}
-                                {replyTo === comment.id && (
-                                    <div className="mt-3 pl-6">
-                                        <CommentForm
-                                            blogId={blogId}
-                                            parentId={comment.id}
-                                            onCommentAdded={() => {
-                                                setReplyTo(null);
-                                                fetchComments();
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                    {commentTree.map(comment => renderComment(comment))}
                 </div>
             ) : (
                 <div className="text-center py-8 text-gray-500">
