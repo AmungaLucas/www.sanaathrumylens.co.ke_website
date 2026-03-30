@@ -7,7 +7,7 @@ import SignupForm from './SignupForm';
 import ResetPasswordForm from './ResetPasswordForm';
 
 export default function AuthModal() {
-    const { showAuthModal, closeAuthModal, authModalTab, setAuthModalTab, authCallback } = useAuth();
+    const { showAuthModal, closeAuthModal, authModalTab, setAuthModalTab, executeAuthCallback } = useAuth();
 
     // Close on escape key
     useEffect(() => {
@@ -32,8 +32,8 @@ export default function AuthModal() {
     if (!showAuthModal) return null;
 
     const handleSuccess = () => {
-        closeAuthModal();
-        if (authCallback) authCallback();
+        // Execute pending callback (e.g., post comment) then close modal
+        executeAuthCallback();
     };
 
     return (

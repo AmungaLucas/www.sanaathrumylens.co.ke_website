@@ -21,13 +21,15 @@ export function AuthProvider({ children }) {
             const res = await fetch('/api/auth/me');
             if (res.ok) {
                 const userData = await res.json();
-                setUser(userData);
-            } else if (res.status === 401) {
-                // User not authenticated, that's fine
+                if (userData && userData.id) {
+                    setUser(userData);
+                } else {
+                    setUser(null);
+                }
+            } else {
                 setUser(null);
             }
         } catch (error) {
-            // Silently handle network errors or other issues
             console.error('Auth check error:', error);
             setUser(null);
         } finally {
@@ -45,7 +47,7 @@ export function AuthProvider({ children }) {
         if (res.ok) {
             const data = await res.json();
             setUser(data.user);
-            closeAuthModal();
+            // Don't close modal here — let the AuthModal handle the callback first
             return { success: true };
         }
 
@@ -63,7 +65,7 @@ export function AuthProvider({ children }) {
         if (res.ok) {
             const data = await res.json();
             setUser(data.user);
-            closeAuthModal();
+            // Don't close modal here — let the AuthModal handle the callback first
             return { success: true };
         }
 
@@ -93,7 +95,12 @@ export function AuthProvider({ children }) {
 
     const closeAuthModal = () => {
         setShowAuthModal(false);
-        setAuthCallback(null);
+    };
+
+    const executeAuthCallback = () => {
+        const cb = authCallback;
+        closeAuthModal();
+        if (cb) cb();
     };
 
     return (
@@ -107,6 +114,7 @@ export function AuthProvider({ children }) {
                 requireAuth,
                 openAuthModal,
                 closeAuthModal,
+                executeAuthCallback,
                 showAuthModal,
                 authModalTab,
                 setAuthModalTab,
