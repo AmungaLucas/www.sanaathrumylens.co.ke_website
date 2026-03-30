@@ -1,15 +1,14 @@
 // src/app/(website)/blogs/[slug]/page.js
 import { notFound } from 'next/navigation';
 import { getBlogBySlug, getRelatedArticles, getRecentStories } from '@/lib/queries';
-import ArticleHeader from './_components/ArticleHeader';
+import HeroSection from './_components/HeroSection';
 import ArticleContent from './_components/ArticleContent';
-import ArticleSidebar from './_components/ArticleSidebar';
 import AuthorBio from './_components/AuthorBio';
 import RelatedArticles from './_components/RelatedArticles';
 import CommentsSection from './_components/CommentsSection';
 import TableOfContents from './_components/TableOfContents';
-import ShareButtons from './_components/ShareButtons';
-import GoogleAd from '@/components/ui/GoogleAd';
+import EngagementBar from './_components/EngagementBar';
+import ArticleBottomWidgets from './_components/ArticleBottomWidgets';
 
 // Generate SEO metadata dynamically
 export async function generateMetadata({ params }) {
@@ -124,57 +123,51 @@ export default async function BlogDetailPage({ params }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
+      <div className="bg-white min-h-screen">
+        {/* Full-width cinematic hero */}
+        <HeroSection blog={blog} />
 
-            {/* Main Content */}
-            <article className="flex-1 min-w-0">
-              {/* Article Header */}
-              <ArticleHeader blog={blog} />
+        {/* Main content area — narrow column for readability */}
+        <main className="max-w-3xl mx-auto px-5 sm:px-6 py-10 md:py-14">
+          <article>
+            {/* Table of Contents (if article is long) */}
+            {blog.content && blog.content.length > 3000 && (
+              <TableOfContents content={blog.content} />
+            )}
 
-              {/* Table of Contents (if article is long) */}
-              {blog.content && blog.content.length > 3000 && (
-                <TableOfContents content={blog.content} />
-              )}
+            {/* Article Content */}
+            <ArticleContent blog={blog} />
 
-              {/* Article Content with In-Content Ads */}
-              <ArticleContent blog={blog} />
+            {/* Author Bio */}
+            <AuthorBio author={blog} />
 
-              {/* Share Buttons */}
-              <ShareButtons
-                url={`https://sanaathrumylens.co.ke/blogs/${blog.slug}`}
-                title={blog.title}
-              />
+            {/* Comments Section */}
+            <CommentsSection blogId={blog.id} />
+          </article>
 
-              {/* Author Bio */}
-              <AuthorBio author={blog} />
-
-              {/* Ad Position: Between Author Bio and Comments */}
-              <div className="my-8">
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200">
-                  <p className="text-xs text-gray-400 mb-2">Advertisement</p>
-                  <GoogleAd slot="blog-between-content" format="auto" style={{ minHeight: '90px' }} />
-                </div>
-              </div>
-
-              {/* Comments Section */}
-              <CommentsSection blogId={blog.id} />
-            </article>
-
-            {/* Sidebar */}
-            <ArticleSidebar
-              recentStories={recentStories}
-              tags={blog.tags || []}
-              categories={blog.categories || []}
-            />
-          </div>
+          {/* Sidebar widgets moved below article */}
+          <ArticleBottomWidgets
+            recentStories={recentStories}
+            tags={blog.tags || []}
+            categories={blog.categories || []}
+          />
 
           {/* Related Articles */}
           {relatedArticles && relatedArticles.length > 0 && (
             <RelatedArticles articles={relatedArticles} />
           )}
-        </div>
+        </main>
+
+        {/* Sticky engagement bar */}
+        <EngagementBar
+          blogId={blog.id}
+          initialLikes={blog.like_count || 0}
+          url={`https://sanaathrumylens.co.ke/blogs/${blog.slug}`}
+          title={blog.title}
+        />
+
+        {/* Bottom padding for sticky bar */}
+        <div className="h-16" />
       </div>
     </>
   );

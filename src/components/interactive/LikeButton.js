@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../providers/AuthProvider';
 
-export default function LikeButton({ blogId, initialCount = 0 }) {
+export default function LikeButton({ blogId, initialCount = 0, compact = false }) {
     const { user, requireAuth } = useAuth();
     const [liked, setLiked] = useState(false);
     const [count, setCount] = useState(initialCount);
@@ -24,7 +24,6 @@ export default function LikeButton({ blogId, initialCount = 0 }) {
     }, [user, blogId]);
 
     const handleLike = async () => {
-        // currentUser is passed by requireAuth to avoid stale closure
         requireAuth(async (currentUser) => {
             if (!currentUser) return;
             setLoading(true);
@@ -53,14 +52,42 @@ export default function LikeButton({ blogId, initialCount = 0 }) {
         });
     };
 
+    if (compact) {
+        return (
+            <button
+                onClick={handleLike}
+                disabled={loading}
+                className={`group flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200 ${
+                    liked
+                        ? 'bg-red-50 text-red-500'
+                        : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500'
+                }`}
+                aria-label={liked ? 'Unlike' : 'Like'}
+            >
+                <svg
+                    className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${liked ? 'fill-current' : 'stroke-current fill-none'}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                </svg>
+                <span className="text-sm font-medium">{count}</span>
+            </button>
+        );
+    }
+
     return (
         <button
             onClick={handleLike}
             disabled={loading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${liked
-                ? 'bg-red-50 text-red-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                liked
+                    ? 'bg-red-50 text-red-600'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
         >
             <svg
                 className={`w-5 h-5 ${liked ? 'fill-current' : 'stroke-current fill-none'}`}
@@ -72,7 +99,7 @@ export default function LikeButton({ blogId, initialCount = 0 }) {
                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                 />
             </svg>
-            <span>{count}</span>
+            <span className="text-sm">{count}</span>
         </button>
     );
 }
