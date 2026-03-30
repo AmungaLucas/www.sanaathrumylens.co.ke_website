@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ArticleCard from '@/app/(website)/(homepage)/_components/ArticleCard';
 import GoogleAd from '@/components/ui/GoogleAd';
-import { getPopularTags } from '@/lib/queries';
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -23,8 +22,15 @@ export default function SearchPage() {
   // Fetch popular tags on mount
   useEffect(() => {
     const fetchTags = async () => {
-      const tags = await getPopularTags(10);
-      setPopularTags(tags);
+      try {
+        const res = await fetch('/api/tags');
+        if (res.ok) {
+          const tags = await res.json();
+          setPopularTags(tags || []);
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
     };
     fetchTags();
   }, []);
@@ -284,5 +290,17 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 }
