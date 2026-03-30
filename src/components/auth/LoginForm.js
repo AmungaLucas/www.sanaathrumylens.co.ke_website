@@ -83,12 +83,12 @@ export default function LoginForm({ onSuccess }) {
                 </div>
             </div>
 
-            <SocialAuth onSuccess={onSuccess} />
+            <SocialAuth mode="login" />
 
             <div className="text-center mt-4">
                 <button
                     type="button"
-                    onClick={() => setAuthModalTab('reset')} // ✅ clean
+                    onClick={() => setAuthModalTab('reset')}
                     className="text-sm text-blue-600 hover:text-blue-800"
                 >
                     Forgot password?

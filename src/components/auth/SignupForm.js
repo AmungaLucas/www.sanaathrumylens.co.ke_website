@@ -124,7 +124,7 @@ export default function SignupForm({ onSuccess }) {
                 </div>
             </div>
 
-            <SocialAuth onSuccess={onSuccess} />
+            <SocialAuth mode="signup" />
 
             <p className="text-xs text-center text-gray-500 mt-4">
                 By signing up, you agree to our Terms of Service and Privacy Policy

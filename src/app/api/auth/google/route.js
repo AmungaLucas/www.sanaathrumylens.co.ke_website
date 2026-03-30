@@ -1,58 +1,27 @@
-import { query } from '@/lib/db';
-import { generateToken } from '@/lib/auth';
-import { sendWelcomeEmail } from '@/lib/email';
+import { NextResponse } from 'next/server';
 
-export async function POST(req) {
-    try {
-        const { email, name, googleId, avatar } = await req.json();
+export async function GET(req) {
+    const { searchParams } = new URL(req.url);
+    const redirect = searchParams.get('redirect') || '/';
 
-        // Check if user exists
-        let user = await query('SELECT * FROM public_users WHERE email = ?', [email]);
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
-        if (user.length === 0) {
-            // Create new user
-            const result = await query(
-                `INSERT INTO public_users (email, name, avatar_url, password_hash, email_verified_at) 
-         VALUES (?, ?, ?, '', NOW())`,
-                [email, name, avatar]
-            );
-
-            user = [{ id: result.insertId, email, name }];
-
-            // Send welcome email (don't await to not block response)
-            sendWelcomeEmail(email, name).catch(console.error);
-        }
-
-        const userData = user[0];
-
-        // Generate token
-        const token = generateToken(userData.id, 'public');
-
-        // Update last login
-        await query('UPDATE public_users SET last_active_at = NOW() WHERE id = ?', [userData.id]);
-
-        // Set cookie
-        const response = Response.json({
-            success: true,
-            user: {
-                id: userData.id,
-                email: userData.email,
-                name: userData.name,
-                avatar: userData.avatar_url
-            }
-        });
-
-        response.cookies.set('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60,
-            path: '/',
-        });
-
-        return response;
-    } catch (error) {
-        console.error('Google auth error:', error);
-        return Response.json({ error: 'Internal server error' }, { status: 500 });
+    if (!clientId || !redirectUri) {
+        return NextResponse.redirect(new URL('/login?error=google_not_configured', req.url));
     }
+
+    const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: 'code',
+        scope: 'openid email profile',
+        access_type: 'offline',
+        prompt: 'consent',
+        state: Buffer.from(JSON.stringify({ redirect })).toString('base64'),
+    });
+
+    return NextResponse.redirect(
+        `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
+    );
 }
