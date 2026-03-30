@@ -65,7 +65,7 @@ export default function CommentForm({ blogId, parentId = null, onCommentAdded })
 
             {success && (
                 <div className="p-3 bg-green-50 text-green-700 rounded-lg">
-                    Comment submitted for moderation. It will appear once approved.
+                    Comment posted successfully!
                 </div>
             )}
         </form>

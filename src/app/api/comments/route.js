@@ -72,7 +72,7 @@ export async function POST(req) {
 
         const result = await query(`
       INSERT INTO comments (blog_id, user_id, author_name, author_email, content, status, parent_id, depth, thread_path)
-      VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)
     `, [blogId, userId, authorName || 'Anonymous', authorEmail || null, content, parentId || null, depth, threadPath]);
 
         // Update comment count
@@ -83,7 +83,7 @@ export async function POST(req) {
         return NextResponse.json({
             success: true,
             commentId: result.insertId || null,
-            message: 'Comment submitted for moderation'
+            message: 'Comment posted successfully'
         });
     } catch (error) {
         console.error('Comment error:', error);
