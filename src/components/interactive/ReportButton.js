@@ -29,7 +29,8 @@ export default function ReportButton({ contentType, contentId, contentTitle }) {
             return;
         }
 
-        requireAuth(async () => {
+        requireAuth(async (currentUser) => {
+            if (!currentUser) return;
             setSubmitting(true);
             setError('');
 
@@ -42,7 +43,7 @@ export default function ReportButton({ contentType, contentId, contentTitle }) {
                         contentId,
                         reason: selectedReason,
                         description: description.trim() || null,
-                        reporterId: user.id
+                        reporterId: currentUser.id
                     })
                 });
 

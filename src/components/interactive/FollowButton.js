@@ -9,7 +9,6 @@ export default function FollowButton({ authorId, authorName, initialFollowers = 
     const [followers, setFollowers] = useState(initialFollowers);
     const [loading, setLoading] = useState(false);
 
-    // Check if user is following on mount
     useEffect(() => {
         if (!user || !authorId) return;
 
@@ -25,28 +24,28 @@ export default function FollowButton({ authorId, authorName, initialFollowers = 
     }, [user, authorId]);
 
     const handleFollow = async () => {
-        requireAuth(async () => {
+        // currentUser is passed by requireAuth to avoid stale closure
+        requireAuth(async (currentUser) => {
+            if (!currentUser) return;
             setLoading(true);
 
             if (following) {
-                // Unfollow
-                const res = await fetch(`/api/follow?authorId=${authorId}&userId=${user.id}`, {
+                const res = await fetch(`/api/follow?authorId=${authorId}&userId=${currentUser.id}`, {
                     method: 'DELETE'
                 });
                 if (res.ok) {
                     setFollowing(false);
-                    setFollowers(followers - 1);
+                    setFollowers(f => f - 1);
                 }
             } else {
-                // Follow
                 const res = await fetch('/api/follow', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ authorId, userId: user.id })
+                    body: JSON.stringify({ authorId, userId: currentUser.id })
                 });
                 if (res.ok) {
                     setFollowing(true);
-                    setFollowers(followers + 1);
+                    setFollowers(f => f + 1);
                 }
             }
 

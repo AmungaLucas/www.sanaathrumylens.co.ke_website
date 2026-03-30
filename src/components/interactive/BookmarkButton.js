@@ -9,7 +9,6 @@ export default function BookmarkButton({ blogId }) {
     const [loading, setLoading] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
 
-    // Check if article is bookmarked on mount
     useEffect(() => {
         if (!user || !blogId) return;
 
@@ -25,12 +24,13 @@ export default function BookmarkButton({ blogId }) {
     }, [user, blogId]);
 
     const handleBookmark = async () => {
-        requireAuth(async () => {
+        // currentUser is passed by requireAuth to avoid stale closure
+        requireAuth(async (currentUser) => {
+            if (!currentUser) return;
             setLoading(true);
 
             if (bookmarked) {
-                // Remove bookmark
-                const res = await fetch(`/api/bookmarks?blogId=${blogId}&userId=${user.id}`, {
+                const res = await fetch(`/api/bookmarks?blogId=${blogId}&userId=${currentUser.id}`, {
                     method: 'DELETE'
                 });
                 if (res.ok) {
@@ -39,11 +39,10 @@ export default function BookmarkButton({ blogId }) {
                     setTimeout(() => setShowTooltip(false), 2000);
                 }
             } else {
-                // Add bookmark
                 const res = await fetch('/api/bookmarks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ blogId, userId: user.id })
+                    body: JSON.stringify({ blogId, userId: currentUser.id })
                 });
                 if (res.ok) {
                     setBookmarked(true);
@@ -79,7 +78,6 @@ export default function BookmarkButton({ blogId }) {
                 </svg>
             </button>
 
-            {/* Tooltip */}
             {showTooltip && (
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap animate-fade-in">
                     {bookmarked ? 'Saved to bookmarks' : 'Removed from bookmarks'}

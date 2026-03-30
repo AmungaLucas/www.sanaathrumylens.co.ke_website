@@ -24,11 +24,13 @@ export default function LikeButton({ blogId, initialCount = 0 }) {
     }, [user, blogId]);
 
     const handleLike = async () => {
-        requireAuth(async () => {
+        // currentUser is passed by requireAuth to avoid stale closure
+        requireAuth(async (currentUser) => {
+            if (!currentUser) return;
             setLoading(true);
 
             if (liked) {
-                const res = await fetch(`/api/likes?blogId=${blogId}&userId=${user.id}`, {
+                const res = await fetch(`/api/likes?blogId=${blogId}&userId=${currentUser.id}`, {
                     method: 'DELETE'
                 });
                 if (res.ok) {
@@ -39,7 +41,7 @@ export default function LikeButton({ blogId, initialCount = 0 }) {
                 const res = await fetch('/api/likes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ blogId, userId: user.id })
+                    body: JSON.stringify({ blogId, userId: currentUser.id })
                 });
                 if (res.ok) {
                     setLiked(true);

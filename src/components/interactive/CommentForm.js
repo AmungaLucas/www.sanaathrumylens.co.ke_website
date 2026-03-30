@@ -14,17 +14,17 @@ export default function CommentForm({ blogId, parentId = null, onCommentAdded })
 
         if (!content.trim()) return;
 
-        // Require authentication for commenting
-        requireAuth(async () => {
+        // currentUser is passed by requireAuth to avoid stale closure
+        requireAuth(async (currentUser) => {
             setSubmitting(true);
 
             const payload = {
                 blogId,
                 content,
                 parentId,
-                userId: user?.id,
-                authorName: user?.name || 'Anonymous',
-                authorEmail: user?.email || null
+                userId: currentUser?.id,
+                authorName: currentUser?.name || 'Anonymous',
+                authorEmail: currentUser?.email || null
             };
 
             const res = await fetch('/api/comments', {

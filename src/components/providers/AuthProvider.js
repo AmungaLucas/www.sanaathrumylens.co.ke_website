@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 
 const AuthContext = createContext();
 
@@ -8,10 +8,17 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showAuthModal, setShowAuthModal] = useState(false);
-    const [authModalTab, setAuthModalTab] = useState('login'); // 'login' or 'signup'
+    const [authModalTab, setAuthModalTab] = useState('login');
     const [authCallback, setAuthCallback] = useState(null);
 
-    // Check if user is logged in on mount
+    // Ref always holds the freshest user — prevents stale closures in deferred callbacks
+    const userRef = useRef(null);
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        userRef.current = user;
+    }, [user]);
+
     useEffect(() => {
         checkAuth();
     }, []);
@@ -47,7 +54,6 @@ export function AuthProvider({ children }) {
         if (res.ok) {
             const data = await res.json();
             setUser(data.user);
-            // Don't close modal here — let the AuthModal handle the callback first
             return { success: true };
         }
 
@@ -65,7 +71,6 @@ export function AuthProvider({ children }) {
         if (res.ok) {
             const data = await res.json();
             setUser(data.user);
-            // Don't close modal here — let the AuthModal handle the callback first
             return { success: true };
         }
 
@@ -78,9 +83,10 @@ export function AuthProvider({ children }) {
         setUser(null);
     };
 
+    // Pass the fresh user to the callback to avoid stale closures
     const requireAuth = (callback, tab = 'login') => {
         if (user) {
-            callback();
+            callback(user);
         } else {
             setAuthModalTab(tab);
             setAuthCallback(() => callback);
@@ -97,10 +103,14 @@ export function AuthProvider({ children }) {
         setShowAuthModal(false);
     };
 
+    // Execute pending callback with the FRESH user from ref (not the stale closure)
     const executeAuthCallback = () => {
         const cb = authCallback;
+        const freshUser = userRef.current;
         closeAuthModal();
-        if (cb) cb();
+        if (cb && freshUser) {
+            cb(freshUser);
+        }
     };
 
     return (
@@ -118,7 +128,6 @@ export function AuthProvider({ children }) {
                 showAuthModal,
                 authModalTab,
                 setAuthModalTab,
-                authCallback,
             }}
         >
             {children}
