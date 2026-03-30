@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
-    const { searchParams } = new URL(req.url);
-    const redirect = searchParams.get('redirect') || '/';
-
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
-    if (!clientId || !redirectUri) {
+    if (!clientId) {
         return NextResponse.redirect(new URL('/login?error=google_not_configured', req.url));
     }
+
+    // Build redirect_uri dynamically from the current request origin
+    const origin = req.headers.get('x-forwarded-host')
+        ? `${req.headers.get('x-forwarded-proto') || 'https'}://${req.headers.get('x-forwarded-host')}`
+        : req.headers.get('host')
+            ? `http://${req.headers.get('host')}`
+            : 'http://localhost:3000';
+
+    const redirectUri = `${origin}/api/auth/google/callback`;
 
     const params = new URLSearchParams({
         client_id: clientId,
@@ -18,7 +23,7 @@ export async function GET(req) {
         scope: 'openid email profile',
         access_type: 'offline',
         prompt: 'consent',
-        state: Buffer.from(JSON.stringify({ redirect })).toString('base64'),
+        state: Buffer.from(JSON.stringify({ redirect: '/', origin })).toString('base64'),
     });
 
     return NextResponse.redirect(

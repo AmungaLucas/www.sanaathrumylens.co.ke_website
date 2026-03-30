@@ -8,7 +8,14 @@ export async function GET(req) {
     const state = searchParams.get('state');
     const error = searchParams.get('error');
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Build base URL dynamically from the current request
+    const origin = req.headers.get('x-forwarded-host')
+        ? `${req.headers.get('x-forwarded-proto') || 'https'}://${req.headers.get('x-forwarded-host')}`
+        : req.headers.get('host')
+            ? `http://${req.headers.get('host')}`
+            : 'http://localhost:3000';
+
+    const baseUrl = origin;
 
     if (error) {
         return NextResponse.redirect(`${baseUrl}/login?error=google_denied`);
@@ -29,6 +36,9 @@ export async function GET(req) {
         // Invalid state, use default redirect
     }
 
+    // Build redirect_uri dynamically (must match what was sent to Google)
+    const redirectUri = `${origin}/api/auth/google/callback`;
+
     try {
         // 1. Exchange code for access token
         const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -38,7 +48,7 @@ export async function GET(req) {
                 code,
                 client_id: process.env.GOOGLE_CLIENT_ID,
                 client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+                redirect_uri: redirectUri,
                 grant_type: 'authorization_code',
             }),
         });
@@ -76,7 +86,6 @@ export async function GET(req) {
         if (existingByGoogle.length > 0) {
             const user = existingByGoogle[0];
 
-            // Update avatar from Google
             await query('UPDATE public_users SET avatar_url = ?, last_login_at = NOW() WHERE id = ?', [avatar, user.id]);
 
             const token = generateToken(user.id, 'public');
@@ -101,21 +110,17 @@ export async function GET(req) {
         if (existingByEmail.length > 0) {
             const user = existingByEmail[0];
 
-            // Store Google data temporarily so the linking page can use it
-            // We'll encode it into a short-lived verification flow
             const linkToken = generateToken(
                 { userId: user.id, googleId, email, name, avatar, action: 'link_google' },
-                'link' // separate type to avoid confusion with auth tokens
+                'link'
             );
 
-            const response = NextResponse.redirect(
-                `${baseUrl}/link-account?token=${encodeURIComponent(linkToken)}`
-            );
+            const response = NextResponse.redirect(`${baseUrl}/link-account`);
             response.cookies.set('link_token', linkToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
-                maxAge: 10 * 60, // 10 minutes
+                maxAge: 10 * 60,
                 path: '/',
             });
             return response;
@@ -131,7 +136,6 @@ export async function GET(req) {
             [email, finalUsername, name, avatar, googleId]
         );
 
-        // Fetch the new user back
         const [newUser] = await query('SELECT id FROM public_users WHERE google_id = ?', [googleId]);
 
         if (!newUser) {
