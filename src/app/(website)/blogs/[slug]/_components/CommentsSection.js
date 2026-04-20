@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import CommentForm from '@/components/interactive/CommentForm';
 import ReportButton from '@/components/interactive/ReportButton';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -83,11 +83,15 @@ function CommentItem({ comment, onReply, replyTo, setReplyTo, blogId, onCommentA
 
             <div className="flex gap-3 py-3">
                 {/* Avatar */}
-                <img
-                    src={comment.avatar_url || '/default-avatar.png'}
-                    alt={comment.author_name}
-                    className="w-10 h-10 rounded-full object-cover flex-shrink-0 bg-gray-100"
-                />
+                <div className="relative w-10 h-10 flex-shrink-0">
+                    <Image
+                        src={comment.avatar_url || '/default-avatar.png'}
+                        alt={comment.author_name}
+                        width={40}
+                        height={40}
+                        className="rounded-full object-cover bg-gray-100"
+                    />
+                </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">

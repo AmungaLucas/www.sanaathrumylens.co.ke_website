@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
+import Image from 'next/image';
 import ReportButton from '@/components/interactive/ReportButton';
 
 export default function ArticleHeader({ blog }) {
@@ -36,11 +36,15 @@ export default function ArticleHeader({ blog }) {
             {/* Author & Meta */}
             <div className="flex flex-wrap items-center gap-4 mb-6 pb-6 border-b border-gray-200">
                 <div className="flex items-center gap-3">
-                    <img
-                        src={blog.author_avatar || '/default-avatar.png'}
-                        alt={blog.author_name}
-                        className="w-12 h-12 rounded-full object-cover"
-                    />
+                    <div className="relative w-12 h-12 flex-shrink-0">
+                        <Image
+                            src={blog.author_avatar || '/default-avatar.png'}
+                            alt={blog.author_name}
+                            width={48}
+                            height={48}
+                            className="rounded-full object-cover"
+                        />
+                    </div>
                     <div>
                         <div className="flex items-center gap-2">
                             <a
@@ -74,11 +78,14 @@ export default function ArticleHeader({ blog }) {
 
             {/* Featured Image */}
             {blog.featured_image && (
-                <div className="mb-8">
-                    <img
+                <div className="mb-8 relative">
+                    <Image
                         src={blog.featured_image}
                         alt={blog.featured_image_alt || blog.title}
+                        width={1200}
+                        height={630}
                         className="w-full h-auto rounded-xl shadow-lg"
+                        sizes="(max-width: 768px) 100vw, 800px"
                     />
                     {blog.featured_image_alt && (
                         <p className="text-xs text-gray-500 mt-2 text-center">

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 import LikeButton from '@/components/interactive/LikeButton';
 
 export default function ArticleCard({ article, index }) {
@@ -6,10 +6,12 @@ export default function ArticleCard({ article, index }) {
         <article className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow">
             {article.featured_image && (
                 <div className="relative overflow-hidden h-48">
-                    <img
+                    <Image
                         src={article.featured_image}
                         alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Category Badge */}
                     {article.categories && article.categories[0] && (
@@ -23,11 +25,15 @@ export default function ArticleCard({ article, index }) {
             <div className="p-5">
                 {/* Author Info */}
                 <div className="flex items-center gap-2 mb-3">
-                    <img
-                        src={article.author_avatar || '/default-avatar.png'}
-                        alt={article.author_name}
-                        className="w-6 h-6 rounded-full object-cover"
-                    />
+                    <div className="relative w-6 h-6 flex-shrink-0">
+                        <Image
+                            src={article.author_avatar || '/default-avatar.png'}
+                            alt={article.author_name}
+                            width={24}
+                            height={24}
+                            className="rounded-full object-cover"
+                        />
+                    </div>
                     <a
                         href={`/authors/${article.author_slug}`}
                         className="text-sm text-gray-600 hover:text-blue-600"

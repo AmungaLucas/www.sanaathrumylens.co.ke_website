@@ -10,6 +10,9 @@ export const metadata = {
   title: "All Articles - Sanaa Thru My Lens",
   description: "Explore our collection of articles on architecture, design, urbanism, and creative culture in Kenya",
   keywords: "kenya architecture articles, design blog, creative ecosystem, urbanism kenya",
+  alternates: {
+    canonical: 'https://www.sanaathrumylens.co.ke/blogs',
+  },
 };
 
 export default async function BlogsPage({ searchParams }) {

@@ -117,10 +117,24 @@ export default async function BlogDetailPage({ params }) {
 
   return (
     <>
-      {/* JSON-LD Structured Data */}
+      {/* JSON-LD Structured Data: Article */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
+      {/* JSON-LD Structured Data: BreadcrumbList */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.sanaathrumylens.co.ke' },
+            { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.sanaathrumylens.co.ke/blogs' },
+            { '@type': 'ListItem', position: 3, name: blog.title, item: `https://www.sanaathrumylens.co.ke/blogs/${blog.slug}` },
+          ],
+        }) }}
       />
 
       <div className="bg-white min-h-screen">

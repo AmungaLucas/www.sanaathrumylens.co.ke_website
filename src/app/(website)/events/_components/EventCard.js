@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function EventCard({ event }) {
     const isPast = new Date(event.start_date) < new Date();
     const isToday = new Date(event.start_date).toDateString() === new Date().toDateString();
@@ -26,10 +26,12 @@ export default function EventCard({ event }) {
             {/* Featured Image */}
             {event.featured_image ? (
                 <div className="relative h-48 overflow-hidden">
-                    <img
+                    <Image
                         src={event.featured_image}
                         alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-3 left-3 flex gap-2">
                         <span className={`px-2 py-1 ${badge.color} text-white text-xs rounded-md`}>

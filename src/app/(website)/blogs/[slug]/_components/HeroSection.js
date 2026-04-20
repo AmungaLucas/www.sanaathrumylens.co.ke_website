@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
+import Image from 'next/image';
 import ReportButton from '@/components/interactive/ReportButton';
 
 export default function HeroSection({ blog }) {
@@ -8,10 +8,13 @@ export default function HeroSection({ blog }) {
         <header className="relative w-full h-[70vh] min-h-[480px] max-h-[700px] overflow-hidden">
             {/* Background Image */}
             {blog.featured_image ? (
-                <img
+                <Image
                     src={blog.featured_image}
                     alt={blog.featured_image_alt || blog.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                    priority
                 />
             ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-700" />
@@ -54,11 +57,15 @@ export default function HeroSection({ blog }) {
                 {/* Author & Meta */}
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-3">
-                        <img
-                            src={blog.author_avatar || '/default-avatar.png'}
-                            alt={blog.author_name}
-                            className="w-11 h-11 rounded-full object-cover ring-2 ring-white/30"
-                        />
+                        <div className="relative w-11 h-11 flex-shrink-0">
+                            <Image
+                                src={blog.author_avatar || '/default-avatar.png'}
+                                alt={blog.author_name}
+                                width={44}
+                                height={44}
+                                className="rounded-full object-cover ring-2 ring-white/30"
+                            />
+                        </div>
                         <div>
                             <div className="flex items-center gap-2">
                                 <a

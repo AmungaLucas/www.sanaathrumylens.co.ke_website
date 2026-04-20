@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LinkAccountPage() {
     const router = useRouter();
@@ -89,11 +90,15 @@ export default function LinkAccountPage() {
                     <div className="bg-gray-50 rounded-xl p-4 mb-6">
                         <div className="flex items-center gap-3">
                             {googleInfo.googleAvatar ? (
-                                <img
-                                    src={googleInfo.googleAvatar}
-                                    alt="Google avatar"
-                                    className="w-12 h-12 rounded-full"
-                                />
+                                <div className="relative w-12 h-12">
+                                    <Image
+                                        src={googleInfo.googleAvatar}
+                                        alt="Google avatar"
+                                        width={48}
+                                        height={48}
+                                        className="rounded-full"
+                                    />
+                                </div>
                             ) : (
                                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                                     <span className="text-red-600 font-bold">G</span>

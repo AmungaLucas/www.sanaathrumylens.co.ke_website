@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { getFeaturedEvents } from '@/lib/queries';
 
 export default async function FeaturedEventsWidget() {
@@ -23,12 +24,15 @@ export default async function FeaturedEventsWidget() {
                     >
                         <div className="flex gap-3">
                             {event.featured_image && (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={event.featured_image}
-                                    alt={event.title}
-                                    className="w-16 h-16 object-cover rounded-lg"
-                                />
+                                <div className="relative w-16 h-16 flex-shrink-0">
+                                    <Image
+                                        src={event.featured_image}
+                                        alt={event.title}
+                                        width={64}
+                                        height={64}
+                                        className="object-cover rounded-lg"
+                                    />
+                                </div>
                             )}
                             <div className="flex-1">
                                 <h4 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 line-clamp-2">

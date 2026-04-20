@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function EditorsPicksSection({ articles }) {
     if (!articles || articles.length === 0) return null;
 
@@ -20,11 +20,13 @@ export default function EditorsPicksSection({ articles }) {
                         className="group"
                     >
                         {article.featured_image && (
-                            <div className="relative overflow-hidden rounded-lg mb-3">
-                                <img
+                            <div className="relative overflow-hidden rounded-lg mb-3 h-48">
+                                <Image
                                     src={article.featured_image}
                                     alt={article.title}
-                                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <span className="text-white text-sm font-medium">Read more →</span>

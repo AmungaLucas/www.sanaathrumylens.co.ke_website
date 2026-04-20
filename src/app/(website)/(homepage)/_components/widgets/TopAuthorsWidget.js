@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function TopAuthorsWidget({ authors }) {
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
@@ -17,11 +17,15 @@ export default function TopAuthorsWidget({ authors }) {
                         className="flex items-center gap-3 group"
                     >
                         <div className="relative">
-                            <img
-                                src={author.avatar_url || '/default-avatar.png'}
-                                alt={author.name}
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
+                            <div className="relative w-10 h-10">
+                                <Image
+                                    src={author.avatar_url || '/default-avatar.png'}
+                                    alt={author.name}
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full object-cover"
+                                />
+                            </div>
                             {index < 3 && (
                                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center text-[10px] font-bold text-white">
                                     {index + 1}

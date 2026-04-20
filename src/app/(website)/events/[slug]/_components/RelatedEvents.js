@@ -1,3 +1,4 @@
+import Image from 'next/image';
 export default function RelatedEvents({ events, currentEventId }) {
     const filteredEvents = events.filter(e => e.id !== currentEventId);
 
@@ -16,12 +17,15 @@ export default function RelatedEvents({ events, currentEventId }) {
                         className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition"
                     >
                         {event.featured_image && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={event.featured_image}
-                                alt={event.title}
-                                className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
+                            <div className="relative h-40 overflow-hidden">
+                                <Image
+                                    src={event.featured_image}
+                                    alt={event.title}
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                            </div>
                         )}
                         <div className="p-4">
                             <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">

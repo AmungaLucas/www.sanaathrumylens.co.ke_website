@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth } from '../providers/AuthProvider';
 
 export default function CommentForm({ blogId, parentId = null, onCommentAdded, compact = false }) {
@@ -72,11 +72,15 @@ export default function CommentForm({ blogId, parentId = null, onCommentAdded, c
                 {/* User avatar */}
                 <div className="flex-shrink-0 pt-1">
                     {user ? (
-                        <img
-                            src={user.avatar_url || user.image || '/default-avatar.png'}
-                            alt={user.name}
-                            className="w-9 h-9 rounded-full object-cover bg-gray-100"
-                        />
+                        <div className="relative w-9 h-9">
+                            <Image
+                                src={user.avatar_url || user.image || '/default-avatar.png'}
+                                alt={user.name}
+                                width={36}
+                                height={36}
+                                className="rounded-full object-cover bg-gray-100"
+                            />
+                        </div>
                     ) : (
                         <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

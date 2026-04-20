@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
+import Image from 'next/image';
 import GoogleAd from '@/components/ui/GoogleAd';
 
 // Import required components
@@ -129,11 +129,15 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {team.map((member, index) => (
                   <div key={index} className="flex gap-4">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
+                    <div className="relative w-20 h-20 flex-shrink-0">
+                      <Image
+                        src={member.avatar}
+                        alt={member.name}
+                        width={80}
+                        height={80}
+                        className="rounded-full object-cover"
+                      />
+                    </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{member.name}</h3>
                       <p className="text-sm text-blue-600 mb-2">{member.role}</p>
@@ -198,4 +202,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function RelatedArticles({ articles }) {
     return (
         <section className="mt-16 pt-12 border-t border-gray-200">
@@ -16,10 +16,12 @@ export default function RelatedArticles({ articles }) {
                         {/* Image with gradient overlay on hover */}
                         <div className="relative overflow-hidden aspect-[16/10]">
                             {article.featured_image ? (
-                                <img
+                                <Image
                                     src={article.featured_image}
                                     alt={article.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                             ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />

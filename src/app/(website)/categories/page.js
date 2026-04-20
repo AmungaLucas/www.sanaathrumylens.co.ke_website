@@ -6,6 +6,9 @@ export const metadata = {
   title: "Categories - Sanaa Thru My Lens",
   description: "Browse articles by category. Explore architecture, design, urbanism, and creative culture in Kenya",
   keywords: "kenya architecture categories, design topics, creative categories",
+  alternates: {
+    canonical: 'https://www.sanaathrumylens.co.ke/categories',
+  },
 };
 
 export default async function CategoriesPage() {

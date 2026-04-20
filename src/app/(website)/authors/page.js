@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 import { getTopAuthors } from '@/lib/queries';
 import Link from 'next/link';
 import GoogleAd from '@/components/ui/GoogleAd';
@@ -41,21 +41,28 @@ export default async function AuthorsPage() {
                   >
                     <div className="relative">
                       {author.cover_image_url ? (
-
-                        <img
-                          src={author.cover_image_url}
-                          alt={author.name}
-                          className="w-full h-32 object-cover"
-                        />
+                        <div className="relative w-full h-32">
+                          <Image
+                            src={author.cover_image_url}
+                            alt={author.name}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover"
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-32 bg-linear-to-r from-blue-500 to-purple-500" />
                       )}
                       <div className="absolute -bottom-10 left-6">
-                        <img
-                          src={author.avatar_url || '/default-avatar.png'}
-                          alt={author.name}
-                          className="w-20 h-20 rounded-full border-4 border-white object-cover"
-                        />
+                        <div className="relative w-20 h-20">
+                          <Image
+                            src={author.avatar_url || '/default-avatar.png'}
+                            alt={author.name}
+                            width={80}
+                            height={80}
+                            className="rounded-full border-4 border-white object-cover"
+                          />
+                        </div>
                       </div>
                     </div>
 

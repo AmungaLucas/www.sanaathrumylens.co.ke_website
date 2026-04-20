@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { getEventBySlug, getUpcomingEvents, checkUserRSVP } from '@/lib/queries';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
@@ -128,11 +128,14 @@ export default async function EventDetailPage({ params }) {
 
               {/* Featured Image */}
               {event.featured_image && (
-                <div className="mb-8">
-                  <img
+                <div className="mb-8 relative">
+                  <Image
                     src={event.featured_image}
                     alt={event.title}
+                    width={1200}
+                    height={630}
                     className="w-full h-auto rounded-xl shadow-lg"
+                    sizes="(max-width: 768px) 100vw, 800px"
                   />
                 </div>
               )}

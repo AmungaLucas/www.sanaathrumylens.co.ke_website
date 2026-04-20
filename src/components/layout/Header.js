@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../providers/AuthProvider';
 import SearchBar from '../interactive/SearchBar';
@@ -76,11 +76,15 @@ export default function Header() {
                         {user ? (
                             <div className="relative group">
                                 <button className="flex items-center gap-2 focus:outline-none">
-                                    <img
-                                        src={user.avatar_url || '/default-avatar.png'}
-                                        alt={user.name}
-                                        className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
-                                    />
+                                    <div className="relative w-8 h-8">
+                                        <Image
+                                            src={user.avatar_url || '/default-avatar.png'}
+                                            alt={user.name}
+                                            width={32}
+                                            height={32}
+                                            className="rounded-full object-cover border-2 border-gray-200"
+                                        />
+                                    </div>
                                     <span className="text-sm font-medium text-gray-700">{user.name?.split(' ')[0]}</span>
                                     <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -205,11 +209,15 @@ export default function Header() {
                         {user ? (
                             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    <img
-                                        src={user.avatar_url || '/default-avatar.png'}
-                                        alt={user.name}
-                                        className="w-8 h-8 rounded-full"
-                                    />
+                                    <div className="relative w-8 h-8">
+                                        <Image
+                                            src={user.avatar_url || '/default-avatar.png'}
+                                            alt={user.name}
+                                            width={32}
+                                            height={32}
+                                            className="rounded-full"
+                                        />
+                                    </div>
                                     <span className="text-sm font-medium">{user.name}</span>
                                 </div>
                                 <button

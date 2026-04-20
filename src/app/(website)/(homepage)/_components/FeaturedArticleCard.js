@@ -1,14 +1,18 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function FeaturedArticleCard({ article }) {
     return (
         <a href={`/blogs/${article.slug}`} className="group block">
             <div className="relative overflow-hidden rounded-xl">
                 {article.featured_image ? (
-                    <img
-                        src={article.featured_image}
-                        alt={article.title}
-                        className="w-full h-64 lg:h-80 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <div className="relative h-64 lg:h-80">
+                        <Image
+                            src={article.featured_image}
+                            alt={article.title}
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 66vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                    </div>
                 ) : (
                     <div className="w-full h-64 lg:h-80 bg-linear-to-br from-gray-800 to-gray-900" />
                 )}

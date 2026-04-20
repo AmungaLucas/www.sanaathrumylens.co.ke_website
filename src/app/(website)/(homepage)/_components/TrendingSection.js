@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function TrendingSection({ articles }) {
     if (!articles || articles.length === 0) return null;
 
@@ -21,11 +21,15 @@ export default function TrendingSection({ articles }) {
                     >
                         <div className="relative">
                             {article.featured_image ? (
-                                <img
-                                    src={article.featured_image}
-                                    alt={article.title}
-                                    className="w-full h-32 object-cover rounded-lg group-hover:opacity-90 transition"
-                                />
+                                <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                                    <Image
+                                        src={article.featured_image}
+                                        alt={article.title}
+                                        fill
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                                        className="object-cover group-hover:opacity-90 transition"
+                                    />
+                                </div>
                             ) : (
                                 <div className="w-full h-32 bg-gray-200 rounded-lg" />
                             )}

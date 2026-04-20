@@ -21,6 +21,9 @@ export const metadata = {
   title: "Events - Sanaa Thru My Lens",
   description: "Discover creative events, workshops, exhibitions, and gatherings in Kenya's creative ecosystem",
   keywords: "kenya events, creative workshops, architecture events, design exhibitions, nairobi events",
+  alternates: {
+    canonical: 'https://www.sanaathrumylens.co.ke/events',
+  },
 };
 
 export default async function EventsPage({ searchParams }) {

@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import {
   getAuthorBySlug,
   getArticlesByAuthor,
@@ -64,11 +64,15 @@ export default async function AuthorPage({ params }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             {/* Avatar */}
-            <img
-              src={author.avatar_url || '/default-avatar.png'}
-              alt={author.name}
-              className="w-32 h-32 rounded-full border-4 border-white object-cover"
-            />
+            <div className="relative w-32 h-32 flex-shrink-0">
+              <Image
+                src={author.avatar_url || '/default-avatar.png'}
+                alt={author.name}
+                width={128}
+                height={128}
+                className="rounded-full border-4 border-white object-cover"
+              />
+            </div>
 
             {/* Author Info */}
             <div className="text-center md:text-left flex-1">

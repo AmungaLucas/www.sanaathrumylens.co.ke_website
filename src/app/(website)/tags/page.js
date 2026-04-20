@@ -6,6 +6,9 @@ export const metadata = {
   title: "Tags - Sanaa Thru My Lens",
   description: "Browse articles by tags. Discover topics like architecture, design, urbanism, and more",
   keywords: "kenya tags, article topics, popular tags",
+  alternates: {
+    canonical: 'https://www.sanaathrumylens.co.ke/tags',
+  },
 };
 
 export default async function TagsPage() {

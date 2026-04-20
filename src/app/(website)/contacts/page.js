@@ -6,6 +6,9 @@ export const metadata = {
   title: "Contact Us - Sanaa Thru My Lens",
   description: "Get in touch with Sanaa Thru My Lens. Send us your thoughts, questions, or collaboration ideas.",
   keywords: "contact sanaa thru my lens, reach out, feedback",
+  alternates: {
+    canonical: 'https://www.sanaathrumylens.co.ke/contacts',
+  },
 };
 
 export default function ContactPage() {

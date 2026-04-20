@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 export default function AuthorBio({ author }) {
     if (!author.author_bio) return null;
 
@@ -10,11 +10,15 @@ export default function AuthorBio({ author }) {
             <div className="flex flex-col sm:flex-row items-start gap-5 pl-3 sm:pl-4">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                    <img
-                        src={author.author_avatar || '/default-avatar.png'}
-                        alt={author.author_name}
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-gray-100"
-                    />
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20">
+                        <Image
+                            src={author.author_avatar || '/default-avatar.png'}
+                            alt={author.author_name}
+                            width={80}
+                            height={80}
+                            className="rounded-full object-cover ring-2 ring-gray-100"
+                        />
+                    </div>
                 </div>
 
                 {/* Info */}

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 import {
   getLatestArticles,
   getTrendingArticles,
@@ -209,11 +209,15 @@ export default async function HomePage() {
                     </span>
                   </div>
                   {featuredArticle.featured_image && (
-                    <img
-                      src={featuredArticle.featured_image}
-                      alt={featuredArticle.title}
-                      className="w-full h-40 object-cover rounded-lg mb-3"
-                    />
+                    <div className="relative w-full h-40 rounded-lg overflow-hidden mb-3">
+                      <Image
+                        src={featuredArticle.featured_image}
+                        alt={featuredArticle.title}
+                        fill
+                        sizes="320px"
+                        className="object-cover"
+                      />
+                    </div>
                   )}
                   <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                     <a href={`/blogs/${featuredArticle.slug}`} className="hover:text-blue-600">

@@ -1,9 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import GoogleAd from '@/components/ui/GoogleAd';
 
 export default function BookmarksPage() {
@@ -144,12 +144,14 @@ export default function BookmarksPage() {
                       <div className="flex flex-col sm:flex-row">
                         {/* Thumbnail */}
                         {article.coverImage && (
-                          <div className="sm:w-48 h-40 sm:h-auto flex-shrink-0">
+                          <div className="sm:w-48 h-40 sm:h-auto flex-shrink-0 relative">
                             <Link href={`/blogs/${article.slug}`}>
-                              <img
+                              <Image
                                 src={article.coverImage}
                                 alt={article.title}
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="192px"
+                                className="object-cover"
                               />
                             </Link>
                           </div>
