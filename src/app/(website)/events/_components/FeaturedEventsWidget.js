@@ -35,7 +35,7 @@ export default async function FeaturedEventsWidget() {
                                     {event.title}
                                 </h4>
                                 <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                                    <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                                    <span>{new Date(event.start_date).toLocaleDateString()}</span>
                                     <span>•</span>
                                     <span>{event.attendees_count || 0} attending</span>
                                 </div>

@@ -34,11 +34,10 @@ export async function generateMetadata({ params }) {
       type: 'event',
       images: event.featured_image ? [event.featured_image] : [],
       event: {
-        startDate: event.event_date,
-        endDate: event.event_end_date,
+        startDate: event.start_date,
+        endDate: event.end_date,
         location: {
-          name: event.location_name,
-          address: event.location_address,
+          name: event.location,
         },
       },
     },
@@ -82,8 +81,8 @@ export default async function EventDetailPage({ params }) {
     '@type': 'Event',
     name: event.title,
     description: event.excerpt,
-    startDate: event.event_date,
-    endDate: event.event_end_date,
+    startDate: event.start_date,
+    endDate: event.end_date,
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: event.is_online
       ? 'https://schema.org/OnlineEventAttendanceMode'
@@ -93,8 +92,7 @@ export default async function EventDetailPage({ params }) {
       url: event.online_url || null,
     } : {
       '@type': 'Place',
-      name: event.location_name,
-      address: event.location_address,
+      name: event.location,
     },
     image: event.featured_image,
     organizer: {
@@ -107,7 +105,7 @@ export default async function EventDetailPage({ params }) {
       price: '0',
       priceCurrency: 'KES',
       availability: 'https://schema.org/InStock',
-      validFrom: event.event_date,
+      validFrom: event.start_date,
     },
   };
 
@@ -143,12 +141,12 @@ export default async function EventDetailPage({ params }) {
               <EventDetails event={event} />
 
               {/* Map (if in-person event with location) */}
-              {!event.is_online && event.location_name && (
-                <EventMap location={event.location_name} />
+              {!event.is_online && event.location && (
+                <EventMap location={event.location} />
               )}
 
               {/* RSVP Form */}
-              {new Date(event.event_date) > new Date() && (
+              {new Date(event.start_date) > new Date() && (
                 <div className="mt-8 bg-linear-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-100">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     Register for this Event

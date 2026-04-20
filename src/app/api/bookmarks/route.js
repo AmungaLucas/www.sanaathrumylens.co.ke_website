@@ -1,52 +1,60 @@
 import { query } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
+// Helper: extract userId from JWT cookie
+function getUserId(req) {
+    const token = req.cookies.get('token')?.value;
+    if (!token) return null;
+    const decoded = verifyToken(token);
+    return decoded?.userId || null;
+}
+
 // Get user's bookmarks
 export async function GET(req) {
     try {
+        const userId = getUserId(req);
         const { searchParams } = new URL(req.url);
-        const userId = searchParams.get('userId');
         const blogId = searchParams.get('blogId');
 
         if (!userId) {
-            return Response.json({ error: 'User ID required' }, { status: 400 });
+            return Response.json({ error: 'Authentication required' }, { status: 401 });
         }
 
         // Check if user exists
-        const user = await query('SELECT id FROM public_users WHERE id = ?', [userId]);
+        const user = await query('SELECT id FROM users WHERE id = ?', [userId]);
         if (user.length === 0) {
             return Response.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // If blogId provided, check if specific blog is bookmarked
+        // If blogId provided, check if specific post is bookmarked
         if (blogId) {
             const result = await query(`
-        SELECT id FROM blog_saves 
-        WHERE user_id = ? AND blog_id = ?
-      `, [userId, blogId]);
+                SELECT id FROM bookmarks
+                WHERE user_id = ? AND post_id = ?
+            `, [userId, blogId]);
 
             return Response.json({ bookmarked: result.length > 0 });
         }
 
         // Otherwise, get all bookmarks for user
         const bookmarks = await query(`
-      SELECT 
-        b.id,
-        b.title,
-        b.slug,
-        b.excerpt,
-        b.featured_image,
-        b.published_at,
-        b.view_count,
-        a.name as author_name,
-        a.slug as author_slug,
-        bs.created_at as saved_at
-      FROM blog_saves bs
-      JOIN blogs b ON bs.blog_id = b.id
-      LEFT JOIN admin_users a ON b.author_id = a.id
-      WHERE bs.user_id = ? AND b.status = 'PUBLISHED'
-      ORDER BY bs.created_at DESC
-    `, [userId]);
+            SELECT
+                b.id,
+                b.title,
+                b.slug,
+                b.excerpt,
+                b.featured_image,
+                b.published_at,
+                b.stats_views as view_count,
+                a.name as author_name,
+                a.slug as author_slug,
+                bm.created_at as saved_at
+            FROM bookmarks bm
+            JOIN posts b ON bm.post_id = b.id
+            LEFT JOIN authors a ON b.author_id = a.id
+            WHERE bm.user_id = ? AND b.status = 'published' AND b.is_deleted = FALSE
+            ORDER BY bm.created_at DESC
+        `, [userId]);
 
         return Response.json(bookmarks);
     } catch (error) {
@@ -58,22 +66,23 @@ export async function GET(req) {
 // Add bookmark
 export async function POST(req) {
     try {
-        const { blogId, userId } = await req.json();
+        const userId = getUserId(req);
+        const { blogId } = await req.json();
 
         if (!blogId || !userId) {
-            return Response.json({ error: 'Blog ID and User ID required' }, { status: 400 });
+            return Response.json({ error: 'Post ID and authentication required' }, { status: 400 });
         }
 
-        // Check if blog exists and is published
-        const blog = await query('SELECT id FROM blogs WHERE id = ? AND status = "PUBLISHED"', [blogId]);
-        if (blog.length === 0) {
-            return Response.json({ error: 'Blog not found' }, { status: 404 });
+        // Check if post exists and is published
+        const post = await query('SELECT id FROM posts WHERE id = ? AND status = ?', [blogId, 'published']);
+        if (post.length === 0) {
+            return Response.json({ error: 'Post not found' }, { status: 404 });
         }
 
         // Check if already bookmarked
         const existing = await query(`
-      SELECT id FROM blog_saves WHERE blog_id = ? AND user_id = ?
-    `, [blogId, userId]);
+            SELECT id FROM bookmarks WHERE post_id = ? AND user_id = ?
+        `, [blogId, userId]);
 
         if (existing.length > 0) {
             return Response.json({ alreadyBookmarked: true });
@@ -81,13 +90,8 @@ export async function POST(req) {
 
         // Add bookmark
         await query(`
-      INSERT INTO blog_saves (blog_id, user_id) VALUES (?, ?)
-    `, [blogId, userId]);
-
-        // Update bookmark count in blogs table (optional)
-        await query(`
-      UPDATE blogs SET bookmark_count = bookmark_count + 1 WHERE id = ?
-    `, [blogId]);
+            INSERT INTO bookmarks (post_id, user_id) VALUES (?, ?)
+        `, [blogId, userId]);
 
         return Response.json({ success: true, message: 'Bookmark added' });
     } catch (error) {
@@ -99,27 +103,22 @@ export async function POST(req) {
 // Remove bookmark
 export async function DELETE(req) {
     try {
+        const userId = getUserId(req);
         const { searchParams } = new URL(req.url);
         const blogId = searchParams.get('blogId');
-        const userId = searchParams.get('userId');
 
         if (!blogId || !userId) {
-            return Response.json({ error: 'Blog ID and User ID required' }, { status: 400 });
+            return Response.json({ error: 'Post ID and authentication required' }, { status: 400 });
         }
 
         // Remove bookmark
         const result = await query(`
-      DELETE FROM blog_saves WHERE blog_id = ? AND user_id = ?
-    `, [blogId, userId]);
+            DELETE FROM bookmarks WHERE post_id = ? AND user_id = ?
+        `, [blogId, userId]);
 
         if (result.affectedRows === 0) {
             return Response.json({ error: 'Bookmark not found' }, { status: 404 });
         }
-
-        // Update bookmark count in blogs table
-        await query(`
-      UPDATE blogs SET bookmark_count = bookmark_count - 1 WHERE id = ?
-    `, [blogId]);
 
         return Response.json({ success: true, message: 'Bookmark removed' });
     } catch (error) {

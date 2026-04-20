@@ -19,7 +19,7 @@ export async function query(sql, params = []) {
     const cleanParams = params.map(param => param === undefined ? null : param);
 
     try {
-        const [rows] = await pool.execute(sql, cleanParams);
+        const [rows] = await pool.query(sql, cleanParams);
         return rows;
     } catch (error) {
         console.error('Database query error:', error);

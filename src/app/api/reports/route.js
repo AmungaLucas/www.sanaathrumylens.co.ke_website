@@ -17,8 +17,8 @@ export async function POST(req) {
         // Check if content exists
         let contentExists = false;
         if (contentType === 'BLOG') {
-            const blog = await query('SELECT id FROM blogs WHERE id = ?', [contentId]);
-            contentExists = blog.length > 0;
+            const post = await query('SELECT id FROM posts WHERE id = ?', [contentId]);
+            contentExists = post.length > 0;
         } else if (contentType === 'COMMENT') {
             const comment = await query('SELECT id FROM comments WHERE id = ?', [contentId]);
             contentExists = comment.length > 0;
@@ -30,9 +30,9 @@ export async function POST(req) {
 
         // Check if user already reported this content
         const existing = await query(`
-      SELECT id FROM content_reports
-      WHERE reporter_id = ? AND content_type = ? AND content_id = ? AND status = 'PENDING'
-    `, [reporterId, contentType, contentId]);
+            SELECT id FROM comment_reports
+            WHERE reporter_id = ? AND comment_id = ? AND status = 'pending'
+        `, [reporterId, contentId]);
 
         if (existing.length > 0) {
             return NextResponse.json({ error: 'You have already reported this content' }, { status: 400 });
@@ -40,38 +40,17 @@ export async function POST(req) {
 
         // Create report
         const result = await query(`
-      INSERT INTO content_reports (reporter_id, content_type, content_id, reason, description, status)
-      VALUES (?, ?, ?, ?, ?, 'PENDING')
-    `, [reporterId, contentType, contentId, reason, description || null]);
-
-        // Fetch the generated UUID back (insertId is 0 for UUID primary keys)
-        let reportId = null;
-        if (result.insertId && result.insertId > 0) {
-            reportId = result.insertId;
-        } else {
-            const [created] = await query(
-                'SELECT id FROM content_reports WHERE reporter_id = ? AND content_type = ? AND content_id = ? AND status = ? ORDER BY created_at DESC LIMIT 1',
-                [reporterId, contentType, contentId, 'PENDING']
-            );
-            reportId = created?.id || null;
-        }
-
-        // Optional: Notify admin (if you have notification system)
-        notifyAdmins(contentType, contentId, reason);
+            INSERT INTO comment_reports (comment_id, reporter_id, reported_user_id, status)
+            VALUES (?, ?, NULL, 'pending')
+        `, [contentId, reporterId]);
 
         return NextResponse.json({
             success: true,
-            reportId,
+            reportId: result.insertId,
             message: 'Thank you for your report. We will review it shortly.'
         });
     } catch (error) {
         console.error('Reports POST error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-}
-
-// Helper function to notify admins (placeholder)
-async function notifyAdmins(contentType, contentId, reason) {
-    // This could send an email or create admin notifications
-    console.log(`New report: ${contentType} #${contentId} - Reason: ${reason}`);
 }

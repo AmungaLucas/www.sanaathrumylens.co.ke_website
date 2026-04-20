@@ -1,7 +1,7 @@
 export default function EventHeader({ event }) {
     const formatDateRange = () => {
-        const start = new Date(event.event_date);
-        const end = event.event_end_date ? new Date(event.event_end_date) : null;
+        const start = new Date(event.start_date);
+        const end = event.end_date ? new Date(event.end_date) : null;
 
         const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
 
@@ -13,8 +13,8 @@ export default function EventHeader({ event }) {
     };
 
     const formatTime = () => {
-        const start = new Date(event.event_date);
-        const end = event.event_end_date ? new Date(event.event_end_date) : null;
+        const start = new Date(event.start_date);
+        const end = event.end_date ? new Date(event.end_date) : null;
 
         const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
 
@@ -26,7 +26,7 @@ export default function EventHeader({ event }) {
     };
 
     const getStatusBadge = () => {
-        const eventDate = new Date(event.event_date);
+        const eventDate = new Date(event.start_date);
         const now = new Date();
 
         if (eventDate < now) {
@@ -84,7 +84,7 @@ export default function EventHeader({ event }) {
                     <div>
                         <p className="text-xs text-gray-500">Location</p>
                         <p className="text-sm font-medium text-gray-900">
-                            {event.is_online ? 'Online Event' : event.location_name || 'TBD'}
+                            {event.is_online ? 'Online Event' : event.location || 'TBD'}
                         </p>
                         {event.is_online && event.online_url && (
                             <a

@@ -14,15 +14,16 @@ export async function GET(req) {
 
     const searchTerm = `%${q}%`;
 
-    // Search articles — 6 placeholders: WHERE (3), CASE WHEN title (1), CASE WHEN excerpt (1), LIMIT (1), OFFSET (1) = 7 total
+    // Search articles
     const articles = await query(`
       SELECT
         b.id, b.title, b.slug, b.excerpt, b.featured_image,
-        b.published_at, b.view_count,
+        b.published_at, b.stats_views as view_count,
         a.name as author_name, a.slug as author_slug
-      FROM blogs b
-      LEFT JOIN admin_users a ON b.author_id = a.id
-      WHERE b.status = 'PUBLISHED'
+      FROM posts b
+      LEFT JOIN authors a ON b.author_id = a.id
+      WHERE b.status = 'published'
+        AND b.is_deleted = FALSE
         AND (b.title LIKE ? OR b.content LIKE ? OR b.excerpt LIKE ?)
       ORDER BY
         CASE
@@ -37,8 +38,9 @@ export async function GET(req) {
     // Count total results
     const countResult = await query(`
       SELECT COUNT(*) as total
-      FROM blogs
-      WHERE status = 'PUBLISHED'
+      FROM posts
+      WHERE status = 'published'
+        AND is_deleted = FALSE
         AND (title LIKE ? OR content LIKE ? OR excerpt LIKE ?)
     `, [searchTerm, searchTerm, searchTerm]);
 

@@ -25,9 +25,9 @@ export default function RelatedEvents({ events, currentEventId }) {
                         )}
                         <div className="p-4">
                             <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                                <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                                <span>{new Date(event.start_date).toLocaleDateString()}</span>
                                 <span>•</span>
-                                <span>{event.is_online ? 'Online' : event.location_name}</span>
+                                <span>{event.is_online ? 'Online' : event.location}</span>
                             </div>
                             <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 line-clamp-2">
                                 {event.title}

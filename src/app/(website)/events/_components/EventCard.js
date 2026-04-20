@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 export default function EventCard({ event }) {
-    const isPast = new Date(event.event_date) < new Date();
-    const isToday = new Date(event.event_date).toDateString() === new Date().toDateString();
+    const isPast = new Date(event.start_date) < new Date();
+    const isToday = new Date(event.start_date).toDateString() === new Date().toDateString();
 
     const formatEventDate = (dateString) => {
         const date = new Date(dateString);
@@ -56,9 +56,9 @@ export default function EventCard({ event }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span>{formatEventDate(event.event_date)}</span>
+                        <span>{formatEventDate(event.start_date)}</span>
                     </div>
-                    {event.location_name && !event.is_online && (
+                    {event.location && !event.is_online && (
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -66,7 +66,7 @@ export default function EventCard({ event }) {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span className="truncate max-w-30">{event.location_name}</span>
+                            <span className="truncate max-w-30">{event.location}</span>
                         </div>
                     )}
                     {event.is_online && (

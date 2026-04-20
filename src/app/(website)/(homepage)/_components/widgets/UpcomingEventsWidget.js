@@ -33,9 +33,9 @@ export default function UpcomingEventsWidget({ events }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                                    <span>{new Date(event.start_date).toLocaleDateString()}</span>
                                 </div>
-                                {event.location_name && (
+                                {event.location && (
                                     <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -43,7 +43,7 @@ export default function UpcomingEventsWidget({ events }) {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                        {event.location_name}
+                                        {event.location}
                                     </p>
                                 )}
                             </div>

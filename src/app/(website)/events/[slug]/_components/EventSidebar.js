@@ -3,7 +3,7 @@ import UpcomingEventsWidget from '../../_components/UpcomingEventsWidget';
 import NewsletterWidget from '@/app/(website)/(homepage)/_components/widgets/NewsletterWidget';
 
 export default function EventSidebar({ event, relatedEvents }) {
-    const isPast = new Date(event.event_date) < new Date();
+    const isPast = new Date(event.start_date) < new Date();
 
     return (
         <aside className="w-full lg:w-80 space-y-6">
@@ -24,7 +24,7 @@ export default function EventSidebar({ event, relatedEvents }) {
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Date</span>
                         <span className="text-gray-900">
-                            {new Date(event.event_date).toLocaleDateString('en-US', {
+                            {new Date(event.start_date).toLocaleDateString('en-US', {
                                 month: 'long',
                                 day: 'numeric',
                                 year: 'numeric',
@@ -34,7 +34,7 @@ export default function EventSidebar({ event, relatedEvents }) {
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Time</span>
                         <span className="text-gray-900">
-                            {new Date(event.event_date).toLocaleTimeString('en-US', {
+                            {new Date(event.start_date).toLocaleTimeString('en-US', {
                                 hour: 'numeric',
                                 minute: '2-digit',
                                 hour12: true,
@@ -47,10 +47,10 @@ export default function EventSidebar({ event, relatedEvents }) {
                             {event.is_online ? 'Online' : 'In-Person'}
                         </span>
                     </div>
-                    {!event.is_online && event.location_name && (
+                    {!event.is_online && event.location && (
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Location</span>
-                            <span className="text-gray-900 text-right">{event.location_name}</span>
+                            <span className="text-gray-900 text-right">{event.location}</span>
                         </div>
                     )}
                     {event.capacity && (

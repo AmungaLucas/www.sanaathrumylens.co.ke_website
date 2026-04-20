@@ -25,10 +25,10 @@ export default async function UpcomingEventsWidget() {
                             <div className="shrink-0 text-center w-12">
                                 <div className="bg-blue-50 rounded-lg p-1">
                                     <div className="text-xs font-bold text-blue-600">
-                                        {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                                        {new Date(event.start_date).toLocaleDateString('en-US', { month: 'short' })}
                                     </div>
                                     <div className="text-lg font-bold text-blue-600">
-                                        {new Date(event.event_date).getDate()}
+                                        {new Date(event.start_date).getDate()}
                                     </div>
                                 </div>
                             </div>
@@ -37,7 +37,7 @@ export default async function UpcomingEventsWidget() {
                                     {event.title}
                                 </h4>
                                 <p className="text-xs text-gray-500 mt-1">
-                                    {event.is_online ? 'Online' : event.location_name}
+                                    {event.is_online ? 'Online' : event.location}
                                 </p>
                             </div>
                         </div>
