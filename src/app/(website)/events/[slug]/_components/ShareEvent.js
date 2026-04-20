@@ -8,8 +8,8 @@ export default function ShareEvent({ url, title }) {
                     title,
                     url,
                 });
-            } catch (err) {
-                console.log('Share cancelled');
+            } catch {
+                // User cancelled the native share dialog — no action needed
             }
         } else {
             await navigator.clipboard.writeText(url);

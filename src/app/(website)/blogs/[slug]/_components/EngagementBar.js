@@ -24,7 +24,7 @@ export default function EngagementBar({ blogId, initialLikes = 0, url, title }) 
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            console.log('Failed to copy');
+            // Clipboard API not available — silently ignore
         }
         setShowShareMenu(false);
     };

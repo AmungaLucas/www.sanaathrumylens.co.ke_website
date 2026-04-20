@@ -15,24 +15,41 @@ export async function GET(request) {
             return NextResponse.json(null, { status: 401 });
         }
 
-        let users;
         if (decoded.userType === 'admin') {
-            users = await query(
-                `SELECT id, email, name, avatar_url, role, status FROM admin_users WHERE id = ?`,
+            const users = await query(
+                `SELECT id, email, name, avatar_url FROM admin_users WHERE id = ?`,
                 [decoded.userId]
             );
+
+            if (users.length === 0) {
+                return NextResponse.json(null, { status: 401 });
+            }
+
+            const user = users[0];
+            return NextResponse.json({
+                id: user.id,
+                email: user.email,
+                display_name: user.name,
+                avatar: user.avatar_url,
+            });
         } else {
-            users = await query(
-                `SELECT id, email, name, avatar_url, status FROM public_users WHERE id = ?`,
+            const users = await query(
+                `SELECT id, email, name, avatar_url FROM public_users WHERE id = ?`,
                 [decoded.userId]
             );
-        }
 
-        if (users.length === 0) {
-            return NextResponse.json(null, { status: 401 });
-        }
+            if (users.length === 0) {
+                return NextResponse.json(null, { status: 401 });
+            }
 
-        return NextResponse.json({ ...users[0], userType: decoded.userType });
+            const user = users[0];
+            return NextResponse.json({
+                id: user.id,
+                email: user.email,
+                display_name: user.name,
+                avatar: user.avatar_url,
+            });
+        }
     } catch (error) {
         console.error('Auth API error:', error);
         return NextResponse.json(null, { status: 500 });

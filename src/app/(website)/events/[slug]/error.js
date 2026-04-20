@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function Error({ error, reset }) {
   useEffect(() => {
-    console.error('Blog error:', error);
+    console.error('Event detail error:', error);
   }, [error]);
 
   return (
@@ -23,7 +23,7 @@ export default function Error({ error, reset }) {
           </div>
         )}
         <p className="text-gray-600 mb-6">
-          We couldn&apos;t load this article. Please try again.
+          We couldn&apos;t load this event. Please try again.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
@@ -33,10 +33,10 @@ export default function Error({ error, reset }) {
             Try Again
           </button>
           <Link
-            href="/blogs"
+            href="/events"
             className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
           >
-            All Articles
+            All Events
           </Link>
           <Link
             href="/"

@@ -17,7 +17,7 @@ export default function ShareButtons({ url, title }) {
             try {
                 await navigator.share(shareData);
             } catch {
-                console.log('Share cancelled');
+                // User cancelled the native share dialog — no action needed
             }
         }
     };
@@ -28,7 +28,7 @@ export default function ShareButtons({ url, title }) {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            console.log('Failed to copy');
+            // Clipboard API not available — silently ignore
         }
     };
 

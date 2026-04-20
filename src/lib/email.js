@@ -24,7 +24,6 @@ export async function sendEmail({ to, subject, html, text }) {
             html,
         });
 
-        console.log('Email sent:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
         console.error('Email error:', error);
