@@ -2,9 +2,43 @@ import { NextResponse } from 'next/server';
 import { hashPassword, generateToken } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { sendWelcomeEmail } from '@/lib/email';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
+
+// Password validation: min 8 chars, uppercase, lowercase, number, special char
+function validatePassword(password) {
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!/[a-z]/.test(password)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  if (!/[0-9]/.test(password)) {
+    return 'Password must contain at least one number';
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return 'Password must contain at least one special character';
+  }
+  return null;
+}
 
 export async function POST(req) {
   try {
+    // Rate limiting: 3 attempts per minute
+    const ip = getClientIp(req);
+    const { success, retryAfter } = rateLimit(ip, 3, 60000);
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(retryAfter) },
+        }
+      );
+    }
+
     const { email, password, name, username } = await req.json();
 
     // Validate presence
@@ -19,8 +53,9 @@ export async function POST(req) {
     }
 
     // Validate password strength
-    if (password.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     // Check if email already registered
@@ -57,7 +92,7 @@ export async function POST(req) {
 
     const response = NextResponse.json({
       success: true,
-      user: { id: userId, email, name }
+      user: { id: userId, email, name },
     });
 
     response.cookies.set('token', token, {

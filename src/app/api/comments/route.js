@@ -1,6 +1,7 @@
 import { query } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Helper: extract userId from JWT cookie
 function getUserId(req) {
@@ -8,6 +9,20 @@ function getUserId(req) {
     if (!token) return null;
     const decoded = verifyToken(token);
     return decoded?.userId || null;
+}
+
+// Sanitize comment content: strip HTML tags, trim, enforce length limits
+function sanitizeCommentContent(content) {
+    if (typeof content !== 'string') return '';
+    // Strip HTML tags
+    const stripped = content.replace(/<[^>]*>/g, '');
+    // Trim whitespace
+    const trimmed = stripped.trim();
+    // Enforce length limits
+    if (trimmed.length > 5000) {
+        return trimmed.slice(0, 5000);
+    }
+    return trimmed;
 }
 
 // GET comments for a post
@@ -47,11 +62,37 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Authentication required to comment' }, { status: 401 });
         }
 
+        // Rate limiting: 10 comments per minute
+        const ip = getClientIp(req);
+        const { success: rateLimitSuccess, retryAfter } = rateLimit(ip, 10, 60000);
+        if (!rateLimitSuccess) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                {
+                    status: 429,
+                    headers: { 'Retry-After': String(retryAfter) },
+                }
+            );
+        }
+
         const { blogId, postId, content, authorName, parentId } = await req.json();
         const finalPostId = postId || blogId;
 
         if (!finalPostId || !content) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        // Sanitize comment content
+        const sanitizedContent = sanitizeCommentContent(content);
+
+        // Check for empty comments after sanitization
+        if (!sanitizedContent) {
+            return NextResponse.json({ error: 'Comment cannot be empty' }, { status: 400 });
+        }
+
+        // Validate minimum length (at least 1 character after sanitization)
+        if (sanitizedContent.length < 1) {
+            return NextResponse.json({ error: 'Comment is too short' }, { status: 400 });
         }
 
         // Validate that the post exists
@@ -80,7 +121,7 @@ export async function POST(req) {
         const result = await query(`
       INSERT INTO comments (post_id, user_id, user_name, content, parent_id)
       VALUES (?, ?, ?, ?, ?)
-    `, [finalPostId, userId, authorName || 'Anonymous', content, parentId || null]);
+    `, [finalPostId, userId, authorName || 'Anonymous', sanitizedContent, parentId || null]);
 
         // Update comment count
         await query(`

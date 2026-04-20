@@ -1,15 +1,55 @@
 import { hashPassword } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import crypto from 'crypto';
+
+// Password validation: min 8 chars, uppercase, lowercase, number, special char
+function validatePassword(password) {
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!/[a-z]/.test(password)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  if (!/[0-9]/.test(password)) {
+    return 'Password must contain at least one number';
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return 'Password must contain at least one special character';
+  }
+  return null;
+}
 
 // Request password reset
 export async function POST(req) {
   try {
+    // Rate limiting: 3 attempts per minute
+    const ip = getClientIp(req);
+    const { success, retryAfter } = rateLimit(ip, 3, 60000);
+    if (!success) {
+      return Response.json(
+        { error: 'Too many requests. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(retryAfter) },
+        }
+      );
+    }
+
     const { email } = await req.json();
 
     if (!email) {
       return Response.json({ error: 'Email required' }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return Response.json({ error: 'Please enter a valid email address' }, { status: 400 });
     }
 
     // Check if user exists
@@ -34,7 +74,7 @@ export async function POST(req) {
     // Always return success to prevent email enumeration
     return Response.json({
       success: true,
-      message: 'If an account exists, you will receive a password reset email.'
+      message: 'If an account exists, you will receive a password reset email.',
     });
   } catch (error) {
     console.error('Password reset request error:', error);
@@ -49,6 +89,12 @@ export async function PUT(req) {
 
     if (!token || !newPassword) {
       return Response.json({ error: 'Token and new password required' }, { status: 400 });
+    }
+
+    // Validate new password strength
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return Response.json({ error: passwordError }, { status: 400 });
     }
 
     // Verify token

@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server';
 import { verifyPassword, generateToken } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
   try {
+    // Rate limiting: 5 attempts per minute
+    const ip = getClientIp(req);
+    const { success, retryAfter } = rateLimit(ip, 5, 60000);
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(retryAfter) },
+        }
+      );
+    }
+
     const body = await req.json();
     const { email, password } = body;
 
@@ -57,7 +71,7 @@ export async function POST(req) {
 
     const response = NextResponse.json({
       success: true,
-      user: { id: userData.id, email: userData.email, name: userData.name, userType }
+      user: { id: userData.id, email: userData.email, name: userData.name, userType },
     });
 
     response.cookies.set('token', token, {

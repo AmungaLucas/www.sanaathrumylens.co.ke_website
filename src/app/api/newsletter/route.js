@@ -1,8 +1,22 @@
 import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
     try {
+        // Rate limiting: 10 per minute
+        const ip = getClientIp(req);
+        const { success, retryAfter } = rateLimit(ip, 10, 60000);
+        if (!success) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                {
+                    status: 429,
+                    headers: { 'Retry-After': String(retryAfter) },
+                }
+            );
+        }
+
         const { email, name } = await req.json();
 
         if (!email) {
@@ -15,10 +29,18 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 });
         }
 
+        // Trim email
+        const trimmedEmail = typeof email === 'string' ? email.trim() : '';
+        const trimmedName = typeof name === 'string' ? name.trim() : '';
+
+        if (!trimmedEmail) {
+            return NextResponse.json({ error: 'Email required' }, { status: 400 });
+        }
+
         // Check if already subscribed
         const existing = await query(`
       SELECT id, status FROM newsletter_subscribers WHERE email = ?
-    `, [email]);
+    `, [trimmedEmail]);
 
         if (existing.length > 0) {
             if (existing[0].status === 'ACTIVE') {
@@ -32,7 +54,7 @@ export async function POST(req) {
           UPDATE newsletter_subscribers
           SET status = 'ACTIVE', name = ?
           WHERE email = ?
-        `, [name || null, email]);
+        `, [trimmedName || null, trimmedEmail]);
 
                 return NextResponse.json({
                     success: true,
@@ -44,7 +66,7 @@ export async function POST(req) {
         // New subscription
         await query(`
       INSERT INTO newsletter_subscribers (email, name) VALUES (?, ?)
-    `, [email, name || null]);
+    `, [trimmedEmail, trimmedName || null]);
 
         return NextResponse.json({
             success: true,
