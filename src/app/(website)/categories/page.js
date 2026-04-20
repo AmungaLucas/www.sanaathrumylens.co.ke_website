@@ -2,6 +2,8 @@ import { getAllCategories } from '@/lib/queries';
 import Link from 'next/link';
 import GoogleAd from '@/components/ui/GoogleAd';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Categories - Sanaa Thru My Lens",
   description: "Browse articles by category. Explore architecture, design, urbanism, and creative culture in Kenya",

@@ -3,6 +3,8 @@ import { getTopAuthors } from '@/lib/queries';
 import Link from 'next/link';
 import GoogleAd from '@/components/ui/GoogleAd';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Authors - Sanaa Thru My Lens",
   description: "Meet our talented authors and contributors. Discover their work and expertise in Kenya's creative ecosystem.",

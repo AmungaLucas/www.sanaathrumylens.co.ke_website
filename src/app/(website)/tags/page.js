@@ -2,6 +2,8 @@ import { getPopularTags } from '@/lib/queries';
 import Link from 'next/link';
 import GoogleAd from '@/components/ui/GoogleAd';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Tags - Sanaa Thru My Lens",
   description: "Browse articles by tags. Discover topics like architecture, design, urbanism, and more",

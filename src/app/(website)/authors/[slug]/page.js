@@ -15,6 +15,8 @@ import NewsletterWidget from '@/app/(website)/(homepage)/_components/widgets/New
 import RecentStoriesWidget from '@/app/(website)/(homepage)/_components/widgets/RecentStoriesWidget';
 import FollowButton from '@/components/interactive/FollowButton';
 
+export const dynamic = 'force-dynamic';
+
 // Generate metadata dynamically
 export async function generateMetadata({ params }) {
   const { slug } = await params;

@@ -10,6 +10,8 @@ import CommentsSection from './_components/CommentsSection';
 import TableOfContents from './_components/TableOfContents';
 import EngagementBar from './_components/EngagementBar';
 
+export const dynamic = 'force-dynamic';
+
 // Generate SEO metadata dynamically
 export async function generateMetadata({ params }) {
   // In Next.js 15+, params is a Promise - must await it

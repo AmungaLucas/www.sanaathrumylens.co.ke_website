@@ -5,6 +5,8 @@ import BlogGrid from './_components/BlogGrid';
 import BlogPagination from './_components/BlogPagination';
 import GoogleAd from '@/components/ui/GoogleAd';
 
+export const dynamic = 'force-dynamic';
+
 // SEO Metadata
 export const metadata = {
   title: "All Articles - Sanaa Thru My Lens",

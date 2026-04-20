@@ -16,6 +16,8 @@ import FeaturedEventsWidget from './_components/FeaturedEventsWidget';
 import UpcomingEventsWidget from './_components/UpcomingEventsWidget';
 import NewsletterWidget from '@/app/(website)/(homepage)/_components/widgets/NewsletterWidget';
 
+export const dynamic = 'force-dynamic';
+
 // SEO Metadata
 export const metadata = {
   title: "Events - Sanaa Thru My Lens",

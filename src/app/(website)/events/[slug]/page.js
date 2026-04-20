@@ -12,6 +12,8 @@ import RelatedEvents from './_components/RelatedEvents';
 import ShareEvent from './_components/ShareEvent';
 import GoogleAd from '@/components/ui/GoogleAd';
 
+export const dynamic = 'force-dynamic';
+
 // Generate SEO metadata dynamically
 export async function generateMetadata({ params }) {
   const { slug } = await params;

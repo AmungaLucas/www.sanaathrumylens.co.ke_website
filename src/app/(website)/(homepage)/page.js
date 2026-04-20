@@ -29,6 +29,8 @@ import PopularTagsWidget from './_components/widgets/PopularTagsWidget';
 // Google Ad Component
 import GoogleAd from '@/components/ui/GoogleAd';
 
+export const dynamic = 'force-dynamic';
+
 // SEO Metadata
 export const metadata = {
   title: "Sanaa Thru My Lens - Kenya's Creative Ecosystem",

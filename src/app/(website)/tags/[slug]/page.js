@@ -7,6 +7,8 @@ import NewsletterWidget from '@/app/(website)/(homepage)/_components/widgets/New
 import RecentStoriesWidget from '@/app/(website)/(homepage)/_components/widgets/RecentStoriesWidget';
 import PopularTagsWidget from '@/app/(website)/(homepage)/_components/widgets/PopularTagsWidget';
 
+export const dynamic = 'force-dynamic';
+
 // Generate metadata dynamically
 export async function generateMetadata({ params }) {
   const { slug } = await params;
